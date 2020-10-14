@@ -1,0 +1,32 @@
+<resources>
+    <string name="app_name">货运平台管理系统</string>
+
+    <string name="string_state_preparing">PREPARING</string>
+    <string name="string_state_ready">READY</string>
+    <string name="string_state_connecting">CONNECTING</string>
+    <string name="string_state_streaming">STREAMING</string>
+    <string name="select_company">我是企业</string>
+    <string name="select_car_owner">我是车主</string>
+    <string name="select_driver">我是驾驶员</string>
+    <string name="user_register">注册账号</string>
+    <string name="user_forget">忘记密码</string>
+    <string name="tel_cannot_be_empty">手机号不得为空</string>
+    <string name="password_cannot_be_empty">密码不得为空</string>
+    <string name="sms_code_cannot_be_empty">验证码不得为空</string>
+
+    <string name="buffering">Buffering</string>
+
+    <string name="login_username_hint">请输入手机号</string>
+    <string name="login_password_hint">请输入密码</string>
+    <string name="login_password_hint2">请输入旧密码</string>
+    <string name="login_password_hint3">请输入新密码</string>
+    <string name="login_password_hint4">确认密码</string>
+    <string name="login_yzm_hint">请输入验证码</string>
+
+    <string name="em_live_msg_member_add">进入了直播间</string>
+    <string name="em_live_msg_gift">%1$s 赠送了 %2$s x%3$d</string>
+    <string name="em_live_msg_like">%1$s 点了 %2$d个赞</string>
+    <string name="em_live_msg_normal">普</string>
+    <string name="em_live_msg_barrage">弹</string>
+    <string name="em_live_input_hint">和大家来聊天吧</string>
+</resources>

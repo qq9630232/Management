@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/x200"
+    android:paddingLeft="@dimen/x20"
+    android:paddingRight="@dimen/x20"
+    android:paddingTop="@dimen/x10"
+    android:paddingBottom="@dimen/x10"
+    >
+
+       <LinearLayout
+           android:id="@+id/l"
+           android:orientation="vertical"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_marginTop="@dimen/x50"
+           android:layout_marginLeft="@dimen/x20">
+
+              <ImageView
+
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+
+                  android:background="@mipmap/img_jiashiyuan" />
+       </LinearLayout>
+
+       <LinearLayout
+
+
+           android:layout_width="@dimen/x450"
+           android:layout_height="wrap_content"
+
+           android:layout_marginLeft="@dimen/x100"
+           android:orientation="vertical">
+
+              <LinearLayout
+                  android:layout_width="@dimen/x450"
+                  android:layout_height="wrap_content"
+                  android:layout_marginLeft="@dimen/x2"
+                  android:orientation="vertical">
+
+                     <LinearLayout
+                         android:layout_width="wrap_content"
+                         android:layout_height="wrap_content"
+                         android:layout_marginTop="@dimen/x10"
+                         android:orientation="horizontal">
+
+                            <TextView
+
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:textColor="@color/blue_079EEB"
+                                android:textSize="@dimen/x30"
+                                android:text="所有人:" />
+
+                            <TextView
+                                android:id="@+id/tv_name"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="@dimen/x30"
+                                android:text="未录入信息" />
+                     </LinearLayout>
+
+                     <LinearLayout
+
+                         android:layout_width="wrap_content"
+                         android:layout_height="wrap_content"
+                         android:layout_marginTop="@dimen/x5">
+
+                            <TextView
+
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@id/tv_name"
+                                android:layout_marginTop="@dimen/x5"
+                                android:textColor="@color/blue_079EEB"
+                                android:textSize="@dimen/x30"
+                                android:text="车牌号码:" />
+
+                            <TextView
+                                android:id="@+id/tv_brand"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@id/tv_name"
+                                android:layout_marginTop="@dimen/x5"
+                                android:textSize="@dimen/x30"
+                                android:text="未录入信息" />
+                     </LinearLayout>
+
+                     <LinearLayout
+
+                         android:layout_width="wrap_content"
+                         android:layout_height="wrap_content"
+                         android:layout_marginTop="@dimen/x5"
+                         android:textSize="@dimen/x30"
+                         >
+
+                            <TextView
+
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@id/tv_brand"
+                                android:layout_marginTop="@dimen/x5"
+                                android:textColor="@color/blue_079EEB"
+                                android:textSize="@dimen/x30"
+                                android:text="车辆类型:" />
+
+                            <TextView
+                                android:id="@+id/tv_number"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@id/tv_brand"
+                                android:layout_marginTop="@dimen/x5"
+                                android:textSize="@dimen/x30"
+                                android:text="未录入信息" />
+                     </LinearLayout>
+              </LinearLayout>
+
+
+       </LinearLayout>
+       <LinearLayout
+           android:id="@+id/l2"
+           android:layout_marginLeft="@dimen/x600"
+           android:layout_marginTop="@dimen/x50"
+           android:orientation="vertical"
+           android:layout_marginRight="@dimen/x20"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content">
+
+              <RadioButton
+                  android:id="@+id/rb_check"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_alignParentRight="true"
+                  android:layout_centerVertical="true" />
+       </LinearLayout>
+       <View
+
+           android:layout_width="match_parent"
+           android:layout_alignParentBottom="true"
+           android:layout_height="@dimen/x2"
+           android:layout_marginTop="@dimen/x20"
+           android:background="@color/gray_background" />
+
+</RelativeLayout>
+

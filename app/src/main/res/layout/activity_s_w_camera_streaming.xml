@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Activity.SWCameraStreamingActivity">
+
+    <com.example.freightmanagement.View.CameraPreviewFrameView
+        android:id="@+id/cameraPreview_surfaceView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:layout_gravity="center" />
+
+
+    <TextView
+        android:id="@+id/camera_switch_btn"
+        android:layout_width="@dimen/x40"
+        android:layout_height="@dimen/x30"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="@dimen/x80"
+        android:layout_marginRight="@dimen/x30"
+        android:background="@mipmap/upload_identity"
+        android:gravity="center"
+        android:textColor="@color/color_333"
+        android:textSize="@dimen/x30" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/listview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="@dimen/x40"
+        android:layout_marginTop="@dimen/x600"
+        android:layout_above="@+id/message_view"
+        android:layout_marginBottom="4dp" />
+
+    <com.example.freightmanagement.View.SingleBarrageView
+        android:id="@+id/barrageView"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:layout_marginTop="@dimen/x100" />
+
+    <com.example.freightmanagement.View.RoomMessagesView
+        android:id="@+id/message_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:visibility="visible" />
+</RelativeLayout>

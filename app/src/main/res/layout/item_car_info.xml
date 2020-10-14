@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/x150"
+    android:paddingRight="@dimen/x20"
+    android:paddingTop="@dimen/x10"
+    android:paddingBottom="@dimen/x10"
+
+    android:background="#82AFC6"
+    >
+       <LinearLayout
+           android:id="@+id/l"
+           android:orientation="vertical"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+
+           android:layout_margin="@dimen/x30">
+              <ImageView
+
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+
+                  android:background="@mipmap/img_jiashiyuan" />
+       </LinearLayout>
+
+       <LinearLayout
+           android:id="@+id/ll"
+           android:layout_centerVertical="true"
+           android:layout_marginLeft="@dimen/x100"
+           android:orientation="vertical"
+
+           android:layout_width="@dimen/x600"
+           android:layout_height="wrap_content">
+
+
+
+              <LinearLayout
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:orientation="vertical">
+
+                     <LinearLayout
+                         android:layout_width="match_parent"
+                         android:layout_height="wrap_content"
+                         android:layout_marginLeft="@dimen/x30">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="所属人:"
+                                android:textColor="@color/white"
+                                android:textSize="@dimen/x28" />
+                            <TextView
+                                android:id="@+id/tv_name"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="暂无车辆"
+                                android:textColor="@color/white"
+                                android:textSize="@dimen/x28" />
+                     </LinearLayout>
+
+                     <LinearLayout
+                         android:layout_width="match_parent"
+                         android:layout_height="wrap_content"
+                         android:layout_marginLeft="@dimen/x30"
+
+                         android:layout_marginTop="@dimen/x10"
+                         android:visibility="gone">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="品牌:"
+                                android:textColor="@color/white"
+                                android:textSize="@dimen/x28" />
+
+                            <TextView
+                                android:id="@+id/tv_brand"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@id/tv_name"
+                                android:text="奔驰"
+                                android:textColor="@color/white"
+                                android:textSize="@dimen/x28" />
+                     </LinearLayout>
+
+                     <LinearLayout
+                         android:layout_width="match_parent"
+                         android:layout_height="wrap_content"
+
+                         android:layout_marginLeft="@dimen/x30"
+                         android:layout_marginTop="@dimen/x15">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="车牌号:"
+                                android:textColor="@color/white"
+                                android:textSize="@dimen/x28" />
+
+                            <TextView
+                                android:id="@+id/tv_number"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@id/tv_brand"
+                                android:text="暂无车辆"
+                                android:textColor="@color/white"
+                                android:textSize="@dimen/x28" />
+                     </LinearLayout>
+
+              </LinearLayout>
+
+
+
+
+       </LinearLayout>
+
+</RelativeLayout>
+
