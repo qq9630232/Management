@@ -7,7 +7,7 @@ import com.hyphenate.chat.EMMessage;
 public class DemoMsgHelper {
     private static DemoMsgHelper instance;
     private DemoMsgHelper(){}
-    private String chatroomId="127395385376769";
+    private String chatroomId="";
 
     public static DemoMsgHelper getInstance() {
         if(instance == null) {

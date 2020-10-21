@@ -34,7 +34,13 @@
         android:layout_marginTop="@dimen/x600"
         android:layout_above="@+id/message_view"
         android:layout_marginBottom="4dp" />
-
+    <TextView
+        android:id="@+id/tv_join"
+        android:layout_marginTop="@dimen/x500"
+        android:layout_marginLeft="@dimen/x40"
+        android:background="@drawable/em_live_chat_item_bg_shape"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
     <com.example.freightmanagement.View.SingleBarrageView
         android:id="@+id/barrageView"
         android:layout_width="match_parent"
@@ -47,4 +53,25 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:visibility="visible" />
+    <ImageView
+        android:id="@+id/iv_left_back"
+        android:layout_width="@dimen/x88"
+        android:layout_height="@dimen/x88"
+        android:layout_marginLeft="@dimen/x6"
+        android:layout_marginTop="@dimen/x50"
+        android:background="@mipmap/ic_title_back"
+        android:gravity="center_vertical"
+        android:visibility="visible"
+        tools:ignore="ContentDescription"
+        tools:visibility="visible" />
+    <TextView
+        android:id="@+id/tv_count"
+        android:text="当前人数：1"
+        android:textSize="@dimen/x30"
+        android:textColor="@color/white"
+        android:layout_marginRight="@dimen/x20"
+        android:layout_marginTop="@dimen/x100"
+        android:layout_alignParentRight="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 </RelativeLayout>

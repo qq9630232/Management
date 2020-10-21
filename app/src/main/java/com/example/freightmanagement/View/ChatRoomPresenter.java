@@ -234,45 +234,7 @@ public class ChatRoomPresenter implements EMChatRoomChangeListener, EMMessageLis
     public void setOnChatRoomListener(OnChatRoomListener listener) {
         this.onChatRoomListener = listener;
     }
-//
-//    /**
-//     * 发送礼物消息
-//     * @param bean
-//     * @param callBack
-//     */
-//    public void sendGiftMsg(GiftBean bean, OnMsgCallBack callBack) {
-//        DemoMsgHelper.getInstance().sendGiftMsg(bean.getId(), bean.getNum(), new OnMsgCallBack() {
-//            @Override
-//            public void onSuccess(EMMessage message) {
-//                if(callBack != null) {
-//                    callBack.onSuccess();
-//                    callBack.onSuccess(message);
-//                }
-//                ThreadManager.getInstance().runOnMainThread(()-> {
-//                    if(onChatRoomListener != null) {
-//                        onChatRoomListener.onMessageSelectLast();
-//                    }
-//                });
-//            }
-//
-//            @Override
-//            public void onError(String messageId, int code, String error) {
-//                if(callBack != null) {
-//                    callBack.onError(code, error);
-//                    callBack.onError(messageId, code, error);
-//                }
-//                deleteMuteMsg(messageId, code);
-//                mContext.showToast("errorCode = " + code + "; errorMsg = "+error);
-//            }
-//
-//            @Override
-//            public void onProgress(int progress, String status) {
-//                if(callBack != null) {
-//                    callBack.onProgress(progress, status);
-//                }
-//            }
-//        });
-//    }
+
 
     /**
      * 发送文本或者弹幕消息
