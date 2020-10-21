@@ -2,11 +2,14 @@ package com.example.freightmanagement.Activity;
 
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -14,46 +17,31 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.freightmanagement.Adapter.IMListAdapter;
-import com.example.freightmanagement.Base.BaseActivity;
-import com.example.freightmanagement.Base.BaseApiConstants;
-import com.example.freightmanagement.Base.BaseResponse;
 import com.example.freightmanagement.R;
-import com.example.freightmanagement.Utils.Config;
-import com.example.freightmanagement.Utils.Network.OnRequestResultForCommon;
-import com.example.freightmanagement.Utils.Network.RestApi;
 import com.example.freightmanagement.Utils.PermissionChecker;
-import com.example.freightmanagement.Utils.ToastUtils;
 import com.example.freightmanagement.Utils.Utils;
 import com.example.freightmanagement.View.ChatRoomPresenter;
+import com.example.freightmanagement.View.DemoMsgHelper;
 import com.example.freightmanagement.View.LiveVideoView;
 import com.example.freightmanagement.View.OnMsgCallBack;
 import com.example.freightmanagement.View.RoomMessagesView;
-import com.hyphenate.EMMessageListener;
-import com.example.freightmanagement.widget.MediaController;
-import com.example.freightmanagement.widget.MediaController.OnClickSpeedAdjustListener;
-import com.google.gson.Gson;
+import com.example.freightmanagement.common.EmClientRepository;
+import com.hyphenate.EMValueCallBack;
+import com.hyphenate.chat.EMChatRoom;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMConversation;
 import com.hyphenate.chat.EMMessage;
-import com.pili.pldroid.player.AVOptions;
-import com.pili.pldroid.player.PLOnAudioFrameListener;
-import com.pili.pldroid.player.PLOnBufferingUpdateListener;
-import com.pili.pldroid.player.PLOnCompletionListener;
-import com.pili.pldroid.player.PLOnErrorListener;
-import com.pili.pldroid.player.PLOnInfoListener;
-import com.pili.pldroid.player.PLOnVideoFrameListener;
-import com.pili.pldroid.player.PLOnVideoSizeChangedListener;
 import com.pili.pldroid.player.widget.PLVideoView;
 
 import java.util.List;
 
-public class PlayerActivity extends LiveBaseActivity implements RoomMessagesView.MessageViewListener {
+public class PlayerActivity extends LiveBaseActivity implements RoomMessagesView.MessageViewListener, ChatRoomPresenter.OnChatRoomListener, View.OnClickListener {
 
     private static final String TAG = "PlayerActivity";
     private LiveVideoView mVideoView;
     private LinearLayout mLoadingView;
     private boolean mIsLiveStreaming;
-//    private MediaController mMediaController;
+    //    private MediaController mMediaController;
     private int mDisplayAspectRatio = PLVideoView.ASPECT_RATIO_FIT_PARENT;
     private RecyclerView mListview;
     private RoomMessagesView messageView;
@@ -61,10 +49,15 @@ public class PlayerActivity extends LiveBaseActivity implements RoomMessagesView
     private String roomId;
     private EMConversation conversation;
     private IMListAdapter adapter;
+    private ImageView mIvLeftBack;
+    private TextView mTvCount;
+    private TextView mTvJoin;
+
     @Override
     protected boolean getFitsSystemWindows() {
         return false;
     }
+
     @Override
     public int setLayoutResource() {
         return R.layout.activity_player;
@@ -77,12 +70,17 @@ public class PlayerActivity extends LiveBaseActivity implements RoomMessagesView
         mLoadingView = findViewById(R.id.LoadingView);
         mListview = findViewById(R.id.listview);
         messageView = findViewById(R.id.message_view);
-        EMClient.getInstance().chatManager().addMessageListener(msgListener);
+//        EMClient.getInstance().chatManager().addMessageListener(msgListener);
 
+        mIvLeftBack = findViewById(R.id.iv_left_back);
+        mIvLeftBack.setOnClickListener(this);
+        mTvCount = findViewById(R.id.tv_count);
+        mTvJoin = findViewById(R.id.tv_join);
     }
 
     /**
      * 动态申请权限
+     *
      * @return
      */
     public boolean isPermissionOK() {
@@ -100,12 +98,33 @@ public class PlayerActivity extends LiveBaseActivity implements RoomMessagesView
         live();
         sendMessage();
         EMClient.getInstance().chatManager().addMessageListener(presenter);
+
         onMessageListInit();
+        EmClientRepository emClientRepository = new EmClientRepository();
+        emClientRepository.getMembers(roomId, new EMValueCallBack() {
+            @Override
+            public void onSuccess(Object value) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        List<String> list = (List<String>) value;
+                        mTvCount.setText("当前人数：" + list.size());
+                    }
+                });
+
+
+            }
+
+            @Override
+            public void onError(int error, String errorMsg) {
+
+            }
+        });
+
     }
 
     /**
      * 初始化发送消息按钮
-     *
      */
     protected void onMessageListInit() {
         messageView.init();
@@ -115,13 +134,33 @@ public class PlayerActivity extends LiveBaseActivity implements RoomMessagesView
         mListview.setAdapter(adapter);
         messageView.setMessageViewListener(this);
     }
+
     /**
      * 即时通讯
      */
     private void sendMessage() {
         roomId = getIntent().getStringExtra("roomId");
-        roomId = "127395385376769";
+        DemoMsgHelper.getInstance().init(roomId);
+//        roomId = "127395385376769";
         presenter = new ChatRoomPresenter(this, roomId);
+        presenter.setOnChatRoomListener(this);
+        EMClient.getInstance().chatroomManager().joinChatRoom(roomId, new EMValueCallBack<EMChatRoom>() {
+
+            @Override
+            public void onSuccess(EMChatRoom value) {
+                //加入聊天室成功
+                Log.e(TAG, "onLoadData2Remote: ");
+
+            }
+
+            @Override
+            public void onError(final int error, String errorMsg) {
+                //加入聊天室失败
+                Log.e(TAG, "onLoadData2Remote: ");
+            }
+        });
+        presenter.setOnChatRoomListener(this);
+
     }
 
     /**
@@ -131,7 +170,6 @@ public class PlayerActivity extends LiveBaseActivity implements RoomMessagesView
         String mLiveUrl = getIntent().getStringExtra("live_url");
         mIsLiveStreaming = getIntent().getIntExtra("liveStreaming", 1) == 1;
 
-//        mVideoView.setMediaController(mMediaController);
         mVideoView.setVideoPath(mLiveUrl);
     }
 
@@ -199,7 +237,8 @@ public class PlayerActivity extends LiveBaseActivity implements RoomMessagesView
     protected void onDestroy() {
         super.onDestroy();
         mVideoView.stopPlayback();
-        EMClient.getInstance().chatManager().removeMessageListener(msgListener);
+        EMClient.getInstance().chatroomManager().leaveChatRoom(roomId);
+        EMClient.getInstance().chatManager().removeMessageListener(presenter);
 
     }
 
@@ -213,9 +252,6 @@ public class PlayerActivity extends LiveBaseActivity implements RoomMessagesView
                     adapter.refresh();
                     mListview.smoothScrollToPosition(adapter.getItemCount() - 1);
                 }
-//                                if (isBarrageMsg) {
-//                                    barrageView.addData(message);
-//                                }
             }
         });
     }
@@ -235,39 +271,71 @@ public class PlayerActivity extends LiveBaseActivity implements RoomMessagesView
 
     }
 
-    EMMessageListener msgListener = new EMMessageListener() {
+    @Override
+    public void onChatRoomOwnerChanged(String chatRoomId, String newOwner, String oldOwner) {
 
+    }
+    private Handler mCountDownHandler = new Handler() {
         @Override
-        public void onMessageReceived(List<EMMessage> messages) {
-            //收到消息
-            adapter.refresh(messages);
-        }
+        public void handleMessage(Message msg) {
+            //时间
+            if ((msg.arg1 -= 1) <= 0) {
+                //重置
+                mTvJoin.setText("");
+                mTvJoin.setVisibility(View.GONE);
+//                mTvHqyzm.setTextColor(getResources().getColor(R.color.color_FFFF5C1F));
+//                mTvHqyzm.setBackground(getResources().getDrawable(R.drawable.yellow_line90));
+            } else {
 
-        @Override
-        public void onCmdMessageReceived(List<EMMessage> messages) {
-            //收到透传消息
-        }
-
-        @Override
-        public void onMessageRead(List<EMMessage> messages) {
-            //收到已读回执
-        }
-
-        @Override
-        public void onMessageDelivered(List<EMMessage> message) {
-            //收到已送达回执
-        }
-        @Override
-        public void onMessageRecalled(List<EMMessage> messages) {
-            //消息被撤回
-        }
-
-        @Override
-        public void onMessageChanged(EMMessage message, Object change) {
-            //消息状态变动
+            }
         }
     };
+    @Override
+    public void onChatRoomMemberAdded(String participant) {
+        mTvJoin.setVisibility(View.VISIBLE);
+        mTvJoin.setText(participant+"进入了直播间");
+        Message message = mCountDownHandler.obtainMessage();
+        message.arg1 = 60;
+        mCountDownHandler.sendMessage(message);
+    }
 
+    @Override
+    public void onChatRoomMemberExited(String participant) {
+
+    }
+
+    @Override
+    public void onMessageReceived() {
+        //刷新消息列表
+        if (adapter != null) {
+            adapter.refresh();
+            mListview.smoothScrollToPosition(adapter.getItemCount() - 1);
+        }
+    }
+
+    @Override
+    public void onMessageSelectLast() {
+
+    }
+
+    @Override
+    public void onMessageChanged() {
+
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.iv_left_back:
+                finish();
+                break;
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+    }
 
 
 }

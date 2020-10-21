@@ -246,6 +246,13 @@ public class BaseApiConstants {
       * * 获取推流Key
      */
     public static final String API_PLAY_KEY = "/cccc/meeting/createMeeting";
+
+    /**
+     * 结束会议
+     */
+    public static final String API_END_MEETING = "/cccc/meeting/endMeeting";
+
+
     /**
      * 获取拉流URL
      */

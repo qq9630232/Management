@@ -3,7 +3,6 @@ package com.example.freightmanagement.Activity;
 
 import android.content.Intent;
 import android.hardware.Camera;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -27,9 +26,6 @@ import com.example.freightmanagement.presenter.MeetingPresenter;
 import com.example.freightmanagement.presenter.constract.MeetingConstact;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.hyphenate.EMValueCallBack;
-import com.hyphenate.chat.EMChatRoom;
-import com.hyphenate.chat.EMClient;
 import com.qiniu.pili.droid.streaming.CameraStreamingSetting;
 
 import java.util.List;
@@ -40,7 +36,7 @@ public class MeetingActivity extends BaseActivity<MeetingPresenter> implements M
     private MeetingAdapter meetingAdapter;
     private List<MeetingListBean.DataBean> data;
     private TextView mTvLive;
-
+    private String roomId;
     @Override
     public int setLayoutResource() {
         return R.layout.activity_meeting;
@@ -83,6 +79,7 @@ public class MeetingActivity extends BaseActivity<MeetingPresenter> implements M
         BaseResponse response = new Gson().fromJson(json, BaseResponse.class);
         String url = (String) response.getData();
         Intent intent = new Intent(this, PlayerActivity.class);
+        intent.putExtra("roomId",roomId);
         intent.putExtra("live_url", url);
         startActivity(intent);
     }
@@ -95,22 +92,9 @@ public class MeetingActivity extends BaseActivity<MeetingPresenter> implements M
     @Override
     public void onItemClick(int position) {
         String streamKey = data.get(position).getStreamKey();
-        String roomId = data.get(position).getRoomId();
+        roomId = data.get(position).getRoomId();
         mPresenter.getPullUrl(streamKey);
-        EMClient.getInstance().chatroomManager().joinChatRoom(roomId, new EMValueCallBack<EMChatRoom>() {
 
-            @Override
-            public void onSuccess(EMChatRoom value) {
-                //加入聊天室成功
-                Log.e(TAG, "onLoadData2Remote: ");
-            }
-
-            @Override
-            public void onError(final int error, String errorMsg) {
-                //加入聊天室失败
-                Log.e(TAG, "onLoadData2Remote: ");
-            }
-        });
     }
     private CameraConfig buildCameraConfig() {
         CameraConfig cameraConfig = new CameraConfig();
@@ -187,8 +171,6 @@ public class MeetingActivity extends BaseActivity<MeetingPresenter> implements M
                 intent.putExtra("TRANSFER_MODE_QUIC", false);
                 intent.putExtra("url", url);
                 intent.putExtra("roomId",roomId);
-                Log.e("zxz",url);
-
                 intent.putExtra("CameraConfig", buildCameraConfig());
                 startActivity(intent);
 

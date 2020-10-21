@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.hardware.Camera;
 import android.media.AudioFormat;
 import android.os.Handler;
+import android.os.Message;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
@@ -16,6 +17,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,6 +41,7 @@ import com.example.freightmanagement.View.DemoMsgHelper;
 import com.example.freightmanagement.View.OnMsgCallBack;
 import com.example.freightmanagement.View.RoomMessagesView;
 import com.example.freightmanagement.View.SingleBarrageView;
+import com.example.freightmanagement.common.EmClientRepository;
 import com.google.gson.JsonObject;
 import com.hyphenate.EMValueCallBack;
 import com.hyphenate.chat.EMChatRoom;
@@ -47,7 +50,6 @@ import com.hyphenate.chat.EMConversation;
 import com.hyphenate.chat.EMCustomMessageBody;
 import com.hyphenate.chat.EMMessage;
 import com.hyphenate.chat.EMTextMessageBody;
-import com.hyphenate.exceptions.HyphenateException;
 import com.qiniu.pili.droid.streaming.AVCodecType;
 import com.qiniu.pili.droid.streaming.CameraStreamingSetting;
 import com.qiniu.pili.droid.streaming.MediaStreamingManager;
@@ -65,7 +67,7 @@ import java.util.Map;
 
 public class SWCameraStreamingActivity extends StreamingBaseActivity implements StreamingPreviewCallback,
         CameraPreviewFrameView.Listener,
-        SurfaceTextureCallback {
+        SurfaceTextureCallback, ChatRoomPresenter.OnChatRoomListener, View.OnClickListener {
 
 
     CameraPreviewFrameView mCameraPreviewSurfaceView;
@@ -89,6 +91,9 @@ public class SWCameraStreamingActivity extends StreamingBaseActivity implements 
     private ListAdapter adapter;
     private EMConversation conversation;
     private String push_url;
+    private ImageView mIvLeftBack;
+    private TextView mTvCount;
+    private TextView mTvJoin;
 
 
     @Override
@@ -104,6 +109,11 @@ public class SWCameraStreamingActivity extends StreamingBaseActivity implements 
         showInputView();
         push_url = getIntent().getStringExtra("push_url");
         chatroomId = getIntent().getStringExtra("roomId");
+        mIvLeftBack = findViewById(R.id.iv_left_back);
+        mIvLeftBack.setOnClickListener(this);
+        mTvCount = findViewById(R.id.tv_count);
+
+        mTvJoin = findViewById(R.id.tv_join);
 
     }
 
@@ -121,37 +131,19 @@ public class SWCameraStreamingActivity extends StreamingBaseActivity implements 
     }
 
     protected ChatRoomPresenter presenter;
-    /**
-     * \~chinese
-     * 创建聊天室，聊天室最大人数上限10000。只有特定用户有权限创建聊天室。
-     * @param subject           名称
-     * @param description       描述
-     * @param welcomeMessage    邀请成员加入聊天室的消息
-     * @param maxUserCount      允许加入聊天室的最大成员数
-     * @param members           邀请加入聊天室的成员列表
-     * @return EMChatRoom 聊天室
-     * @throws
-     */
-    private  EMChatRoom createRoom(String subject, String description, String welcomeMessage, int maxUserCount, List<String> members) throws HyphenateException {
-        EMChatRoom chatRoom = EMClient.getInstance().chatroomManager().createChatRoom(subject, description, welcomeMessage, maxUserCount, members);
-        return chatRoom;
-    }
+
     @Override
     protected void onLoadData2Remote() {
-
-//        EMClient.getInstance().createAccount("1", pwd);//同步方法
-
-        //注册失败会抛出HyphenateException
         presenter = new ChatRoomPresenter(this, chatroomId);
-//        try {
-//            EMClient.getInstance().createAccount("sdc", "123456");//同步方法
-        //roomId为聊天室ID
-        EMClient.getInstance().chatroomManager().joinChatRoom("127395385376769", new EMValueCallBack<EMChatRoom>() {
+        presenter.setOnChatRoomListener(this);
+        EMClient.getInstance().chatroomManager().joinChatRoom(chatroomId, new EMValueCallBack<EMChatRoom>() {
 
             @Override
             public void onSuccess(EMChatRoom value) {
                 //加入聊天室成功
                 Log.e(TAG, "onLoadData2Remote: ");
+                addChatRoomChangeListener();
+
             }
 
             @Override
@@ -161,11 +153,29 @@ public class SWCameraStreamingActivity extends StreamingBaseActivity implements 
             }
         });
 
-//        } catch (HyphenateException e) {
-//            e.printStackTrace();
-//        }
         EMClient.getInstance().chatManager().addMessageListener(presenter);
         onMessageListInit();
+        DemoMsgHelper.getInstance().init(chatroomId);
+        EmClientRepository emClientRepository = new EmClientRepository();
+        emClientRepository.getMembers(chatroomId, new EMValueCallBack() {
+            @Override
+            public void onSuccess(Object value) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        List<String> list = (List<String>) value;
+                        mTvCount.setText("当前人数：" + list.size());
+                    }
+                });
+
+
+            }
+
+            @Override
+            public void onError(int error, String errorMsg) {
+
+            }
+        });
 
     }
 
@@ -175,53 +185,50 @@ public class SWCameraStreamingActivity extends StreamingBaseActivity implements 
         adapter = new ListAdapter(getContext(), conversation);
         listview.setLayoutManager(new LinearLayoutManager(getContext()));
         listview.setAdapter(adapter);
-        getContext().runOnUiThread(new Runnable() {
+//        getContext().runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+        messageView.setMessageViewListener(new RoomMessagesView.MessageViewListener() {
             @Override
-            public void run() {
-                messageView.setMessageViewListener(new RoomMessagesView.MessageViewListener() {
+            public void onMessageSend(String content, final boolean isBarrageMsg) {
+                presenter.sendTxtMsg(content, isBarrageMsg, new OnMsgCallBack() {
                     @Override
-                    public void onMessageSend(String content, final boolean isBarrageMsg) {
-                        presenter.sendTxtMsg(content, isBarrageMsg, new OnMsgCallBack() {
-                            @Override
-                            public void onSuccess(EMMessage message) {
-                                //刷新消息列表
-                                if (adapter != null) {
-                                    adapter.refresh();
-                                    listview.smoothScrollToPosition(adapter.getItemCount() - 1);
-                                }
-                                if (isBarrageMsg) {
-                                    barrageView.addData(message);
-                                }
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onItemClickListener(final EMMessage message) {
-                        //if(message.getFrom().equals(EMClient.getInstance().getCurrentUser())){
-                        //    return;
-                        //}
-                        String clickUsername = message.getFrom();
-//                        showUserDetailsDialog(clickUsername);
-                    }
-
-                    @Override
-                    public void onHiderBottomBar() {
-//                        comment_image.setVisibility(View.VISIBLE);
+                    public void onSuccess(EMMessage message) {
+                        //刷新消息列表
+                        if (adapter != null) {
+                            adapter.refresh();
+                            listview.smoothScrollToPosition(adapter.getItemCount() - 1);
+                        }
+//                                if (isBarrageMsg) {
+//                                    barrageView.addData(message);
+//                                }
                     }
                 });
-//                comment_image.setVisibility(View.VISIBLE);
-//                if(!chatroom.getAdminList().contains(EMClient.getInstance().getCurrentUser())
-//                        && !chatroom.getOwner().equals(EMClient.getInstance().getCurrentUser())) {
-//                    userManagerView.setVisibility(View.INVISIBLE);
-//                }
-//                isMessageListInited = true;
-//                updateUnreadMsgView();
-//                showMemberList();
+            }
+
+            @Override
+            public void onItemClickListener(final EMMessage message) {
+                //if(message.getFrom().equals(EMClient.getInstance().getCurrentUser())){
+                //    return;
+                //}
+                String clickUsername = message.getFrom();
+//                        showUserDetailsDialog(clickUsername);
+            }
+
+            @Override
+            public void onHiderBottomBar() {
+//                        comment_image.setVisibility(View.VISIBLE);
             }
         });
+//            }
+//        });
     }
-
+    /**
+     * add chat room change listener
+     */
+    protected void addChatRoomChangeListener() {
+        EMClient.getInstance().chatroomManager().addChatRoomChangeListener(presenter);
+    }
     private boolean isPictureStreaming() {
         if (mIsPictureStreaming) {
             Toast.makeText(SWCameraStreamingActivity.this, "is picture streaming, operation failed!", Toast.LENGTH_SHORT).show();
@@ -479,6 +486,66 @@ public class SWCameraStreamingActivity extends StreamingBaseActivity implements 
         return 0;
     }
 
+    @Override
+    public void onChatRoomOwnerChanged(String chatRoomId, String newOwner, String oldOwner) {
+    }
+    private Handler mCountDownHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            //时间
+            if ((msg.arg1 -= 1) <= 0) {
+                //重置
+                mTvJoin.setText("");
+                mTvJoin.setVisibility(View.GONE);
+//                mTvHqyzm.setTextColor(getResources().getColor(R.color.color_FFFF5C1F));
+//                mTvHqyzm.setBackground(getResources().getDrawable(R.drawable.yellow_line90));
+            } else {
+
+            }
+        }
+    };
+    @Override
+    public void onChatRoomMemberAdded(String participant) {
+        mTvJoin.setVisibility(View.VISIBLE);
+        mTvJoin.setText(participant+"进入了直播间");
+        Message message = mCountDownHandler.obtainMessage();
+        message.arg1 = 60;
+        mCountDownHandler.sendMessage(message);
+    }
+
+    @Override
+    public void onChatRoomMemberExited(String participant) {
+
+    }
+
+    @Override
+    public void onMessageReceived() {
+        //刷新消息列表
+        if (adapter != null) {
+            adapter.refresh();
+            listview.smoothScrollToPosition(adapter.getItemCount() - 1);
+        }
+    }
+
+    @Override
+    public void onMessageSelectLast() {
+
+    }
+
+    @Override
+    public void onMessageChanged() {
+
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.iv_left_back:
+                exitLive();
+                break;
+        }
+    }
+
     private class Switcher implements Runnable {
         @Override
         public void run() {
@@ -614,6 +681,8 @@ public class SWCameraStreamingActivity extends StreamingBaseActivity implements 
             ((Activity) getContext()).runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    notifyDataSetChanged();
+
                 }
             });
         }
@@ -633,17 +702,18 @@ public class SWCameraStreamingActivity extends StreamingBaseActivity implements 
     }
 
 
-    private void getKey(String mName,String startTime,String sponsor,String endTime){
+    private void getKey(String mName, String startTime, String sponsor, String endTime) {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("name", mName);
         jsonObject.addProperty("startTime", startTime);
         jsonObject.addProperty("sponsor", sponsor);
         jsonObject.addProperty("endTime", endTime);
-        RestApi.getInstance().post(BaseApiConstants.API_PLAY_KEY,"", new OnRequestResultForCommon() {
+        RestApi.getInstance().post(BaseApiConstants.API_PLAY_KEY, "", new OnRequestResultForCommon() {
             @Override
             public void onSuccess(String json) {
                 super.onSuccess(json);
             }
+
             @Override
             public void onFail() {
                 super.onFail();
@@ -655,6 +725,7 @@ public class SWCameraStreamingActivity extends StreamingBaseActivity implements 
             }
         });
     }
+
     @Override
     protected boolean getFitsSystemWindows() {
         return false;
@@ -663,16 +734,40 @@ public class SWCameraStreamingActivity extends StreamingBaseActivity implements 
     @Override
     public void onBackPressed() {
 //        super.onBackPressed();
+        exitLive();
+    }
+
+    private void exitLive() {
         DialogUtils.showTipsSelectDialog(this, "确认结束直播？", "取消", "确定", new View.OnClickListener() {
 
             @Override
             public void onClick(View arg0) {
-//                                    conversionBeanToJson(2);
             }
         }, new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                finish();
+                JsonObject jsonObject = new JsonObject();
+                jsonObject.addProperty("roomId", chatroomId);
+                String json = jsonObject.toString();
+                RestApi.getInstance().post(BaseApiConstants.API_END_MEETING, json, new OnRequestResultForCommon() {
+                    @Override
+                    public void onSuccess(String json) {
+                        super.onSuccess(json);
+//                        jsonObject.addProperty("startTime", roomId);
+//                        mView.success();
+                        finish();
+                    }
+
+                    @Override
+                    public void onFail() {
+                        super.onFail();
+                    }
+
+                    @Override
+                    public void netUnlink() {
+                        super.netUnlink();
+                    }
+                });
 
             }
         }, true);

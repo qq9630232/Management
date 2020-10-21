@@ -174,8 +174,8 @@ public class LoginActivity extends BaseActivity<LoginPresenter> implements Login
 //                mView.getDataSuc(loginBean);
             }else {
                 //环信默认密码：123abcdg
-                String emPassword = "123abcdg";
-                EMClient.getInstance().login(tel,emPassword,new EMCallBack() {//回调
+//                String emPassword = "123abcdg";
+                EMClient.getInstance().login(tel,password,new EMCallBack() {//回调
                     @Override
                     public void onSuccess() {
                         EMClient.getInstance().groupManager().loadAllGroups();
