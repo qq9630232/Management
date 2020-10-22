@@ -9,6 +9,7 @@ import android.util.Log;
 
 import com.example.freightmanagement.Base.BaseActivity;
 import com.example.freightmanagement.R;
+import com.example.freightmanagement.View.ChatRoomPresenter;
 import com.hyphenate.EMCallBack;
 import com.hyphenate.chat.EMClient;
 import com.qiniu.android.dns.DnsManager;

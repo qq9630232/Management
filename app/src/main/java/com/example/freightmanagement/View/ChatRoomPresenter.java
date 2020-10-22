@@ -1,9 +1,13 @@
 package com.example.freightmanagement.View;
 
+import android.app.Activity;
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.example.freightmanagement.Base.BaseActivity;
+import com.example.freightmanagement.Bean.GiftBean;
+import com.example.freightmanagement.R;
+import com.example.freightmanagement.Utils.ToastUtils;
 import com.hyphenate.EMChatRoomChangeListener;
 import com.hyphenate.EMError;
 import com.hyphenate.EMMessageListener;
@@ -15,13 +19,13 @@ import com.hyphenate.chat.EMTextMessageBody;
 import java.util.List;
 
 public class ChatRoomPresenter implements EMChatRoomChangeListener, EMMessageListener {
-    private BaseActivity mContext;
+    private Activity mContext;
     private String chatroomId;
     private String currentUser;
     private OnChatRoomListener onChatRoomListener;
     private EMConversation conversation;
 
-    public ChatRoomPresenter(BaseActivity context, String chatroomId) {
+    public ChatRoomPresenter(Activity context, String chatroomId) {
         this.mContext = context;
         this.chatroomId = chatroomId;
         currentUser = EMClient.getInstance().getCurrentUser();
@@ -54,7 +58,7 @@ public class ChatRoomPresenter implements EMChatRoomChangeListener, EMMessageLis
         if (roomId.equals(chatroomId)) {
             if (currentUser.equals(participant)) {
                 EMClient.getInstance().chatroomManager().leaveChatRoom(roomId);
-//                mContext.showToast("你已被移除出此房间");
+                ToastUtils.popUpToast("你已被移除出此房间");
                 mContext.finish();
             } else {
                 if(onChatRoomListener != null) {
@@ -67,34 +71,34 @@ public class ChatRoomPresenter implements EMChatRoomChangeListener, EMMessageLis
     @Override
     public void onMuteListAdded(String chatRoomId, List<String> mutes, long expireTime) {
         if(mutes.contains(EMClient.getInstance().getCurrentUser())) {
-//            mContext.showToast(mContext.getString(R.string.em_live_in_mute_list));
+            ToastUtils.popUpToast(mContext.getString(R.string.em_live_in_mute_list));
         }
     }
 
     @Override
     public void onMuteListRemoved(String chatRoomId, List<String> mutes) {
         if(mutes.contains(EMClient.getInstance().getCurrentUser())) {
-//            mContext.showToast(mContext.getString(R.string.em_live_out_mute_list));
+            ToastUtils.popUpToast(mContext.getString(R.string.em_live_out_mute_list));
         }
     }
 
     @Override
     public void onWhiteListAdded(String chatRoomId, List<String> whitelist) {
         if(whitelist.contains(EMClient.getInstance().getCurrentUser())) {
-//            mContext.showToast(mContext.getString(R.string.em_live_anchor_add_white));
+            ToastUtils.popUpToast(mContext.getString(R.string.em_live_anchor_add_white));
         }
     }
 
     @Override
     public void onWhiteListRemoved(String chatRoomId, List<String> whitelist) {
         if(whitelist.contains(EMClient.getInstance().getCurrentUser())) {
-//            mContext.showToast(mContext.getString(R.string.em_live_anchor_remove_from_white));
+            ToastUtils.popUpToast(mContext.getString(R.string.em_live_anchor_remove_from_white));
         }
     }
 
     @Override
     public void onAllMemberMuteStateChanged(String chatRoomId, boolean isMuted) {
-//        mContext.showToast(isMuted ? mContext.getString(R.string.em_live_mute_all) : mContext.getString(R.string.em_live_out_mute_all));
+        ToastUtils.popUpToast(isMuted ? mContext.getString(R.string.em_live_mute_all) : mContext.getString(R.string.em_live_out_mute_all));
     }
 
     @Override
@@ -221,7 +225,7 @@ public class ChatRoomPresenter implements EMChatRoomChangeListener, EMMessageLis
             @Override
             public void onError(String messageId, int code, String error) {
                 deleteMuteMsg(messageId, code);
-//                mContext.showToast("errorCode = " + code + "; errorMsg = "+error);
+                ToastUtils.popUpToast("errorCode = " + code + "; errorMsg = "+error);
             }
 
             @Override
@@ -235,6 +239,44 @@ public class ChatRoomPresenter implements EMChatRoomChangeListener, EMMessageLis
         this.onChatRoomListener = listener;
     }
 
+    /**
+     * 发送礼物消息
+     * @param bean
+     * @param callBack
+     */
+    public void sendGiftMsg(GiftBean bean, OnMsgCallBack callBack) {
+        DemoMsgHelper.getInstance().sendGiftMsg(bean.getId(), bean.getNum(), new OnMsgCallBack() {
+            @Override
+            public void onSuccess(EMMessage message) {
+                if(callBack != null) {
+                    callBack.onSuccess();
+                    callBack.onSuccess(message);
+                }
+                ThreadManager.getInstance().runOnMainThread(()-> {
+                    if(onChatRoomListener != null) {
+                        onChatRoomListener.onMessageSelectLast();
+                    }
+                });
+            }
+
+            @Override
+            public void onError(String messageId, int code, String error) {
+                if(callBack != null) {
+                    callBack.onError(code, error);
+                    callBack.onError(messageId, code, error);
+                }
+                deleteMuteMsg(messageId, code);
+                ToastUtils.popUpToast("errorCode = " + code + "; errorMsg = "+error);
+            }
+
+            @Override
+            public void onProgress(int progress, String status) {
+                if(callBack != null) {
+                    callBack.onProgress(progress, status);
+                }
+            }
+        });
+    }
 
     /**
      * 发送文本或者弹幕消息
@@ -242,7 +284,7 @@ public class ChatRoomPresenter implements EMChatRoomChangeListener, EMMessageLis
      * @param isBarrageMsg
      * @param callBack
      */
-    public void sendTxtMsg(String content, boolean isBarrageMsg, final OnMsgCallBack callBack) {
+    public void sendTxtMsg(String content, boolean isBarrageMsg, OnMsgCallBack callBack) {
         DemoMsgHelper.getInstance().sendMsg(content, isBarrageMsg, new OnMsgCallBack() {
             @Override
             public void onSuccess(EMMessage message) {
@@ -257,7 +299,7 @@ public class ChatRoomPresenter implements EMChatRoomChangeListener, EMMessageLis
                     callBack.onError(messageId, code, error);
                 }
                 deleteMuteMsg(messageId, code);
-//                mContext.showToast("消息发送失败！errorCode = "+code+"; errorMsg = "+error);
+                ToastUtils.popUpToast("消息发送失败！errorCode = "+code+"; errorMsg = "+error);
             }
 
             @Override

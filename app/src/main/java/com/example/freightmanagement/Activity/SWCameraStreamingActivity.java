@@ -32,12 +32,14 @@ import com.example.freightmanagement.Utils.CameraConfig;
 import com.example.freightmanagement.Utils.DialogUtils;
 import com.example.freightmanagement.Utils.Network.OnRequestResultForCommon;
 import com.example.freightmanagement.Utils.Network.RestApi;
+import com.example.freightmanagement.Utils.ToastUtils;
 import com.example.freightmanagement.Utils.Utils;
 import com.example.freightmanagement.View.CameraPreviewFrameView;
 import com.example.freightmanagement.View.ChatRoomPresenter;
 import com.example.freightmanagement.View.DemoConstants;
 import com.example.freightmanagement.View.DemoHelper;
 import com.example.freightmanagement.View.DemoMsgHelper;
+import com.example.freightmanagement.View.OnCustomMsgReceiveListener;
 import com.example.freightmanagement.View.OnMsgCallBack;
 import com.example.freightmanagement.View.RoomMessagesView;
 import com.example.freightmanagement.View.SingleBarrageView;
@@ -67,7 +69,7 @@ import java.util.Map;
 
 public class SWCameraStreamingActivity extends StreamingBaseActivity implements StreamingPreviewCallback,
         CameraPreviewFrameView.Listener,
-        SurfaceTextureCallback, ChatRoomPresenter.OnChatRoomListener, View.OnClickListener {
+        SurfaceTextureCallback, View.OnClickListener, ChatRoomPresenter.OnChatRoomListener, OnCustomMsgReceiveListener {
 
 
     CameraPreviewFrameView mCameraPreviewSurfaceView;
@@ -103,6 +105,7 @@ public class SWCameraStreamingActivity extends StreamingBaseActivity implements 
 
     @Override
     protected void onInitView() {
+
         messageView = (RoomMessagesView) bindView(R.id.message_view);
         barrageView = (SingleBarrageView) bindView(R.id.barrageView);
         listview = (RecyclerView) findViewById(R.id.listview);
@@ -115,6 +118,10 @@ public class SWCameraStreamingActivity extends StreamingBaseActivity implements 
 
         mTvJoin = findViewById(R.id.tv_join);
 
+        DemoMsgHelper.getInstance().init(chatroomId);
+        presenter = new ChatRoomPresenter(this, chatroomId);
+        presenter.setOnChatRoomListener(this);
+        DemoMsgHelper.getInstance().setOnCustomMsgReceiveListener(this);
     }
 
     private void showInputView() {
@@ -134,28 +141,7 @@ public class SWCameraStreamingActivity extends StreamingBaseActivity implements 
 
     @Override
     protected void onLoadData2Remote() {
-        presenter = new ChatRoomPresenter(this, chatroomId);
-        presenter.setOnChatRoomListener(this);
-        EMClient.getInstance().chatroomManager().joinChatRoom(chatroomId, new EMValueCallBack<EMChatRoom>() {
-
-            @Override
-            public void onSuccess(EMChatRoom value) {
-                //加入聊天室成功
-                Log.e(TAG, "onLoadData2Remote: ");
-                addChatRoomChangeListener();
-
-            }
-
-            @Override
-            public void onError(final int error, String errorMsg) {
-                //加入聊天室失败
-                Log.e(TAG, "onLoadData2Remote: ");
-            }
-        });
-
-        EMClient.getInstance().chatManager().addMessageListener(presenter);
         onMessageListInit();
-        DemoMsgHelper.getInstance().init(chatroomId);
         EmClientRepository emClientRepository = new EmClientRepository();
         emClientRepository.getMembers(chatroomId, new EMValueCallBack() {
             @Override
@@ -176,6 +162,24 @@ public class SWCameraStreamingActivity extends StreamingBaseActivity implements 
 
             }
         });
+
+        EMClient.getInstance().chatroomManager().joinChatRoom(chatroomId, new EMValueCallBack<EMChatRoom>() {
+
+            @Override
+            public void onSuccess(EMChatRoom value) {
+                //加入聊天室成功
+                Log.e(TAG, "onLoadData2Remote: ");
+                addChatRoomChangeListener();
+
+            }
+
+            @Override
+            public void onError(final int error, String errorMsg) {
+                //加入聊天室失败
+                Log.e(TAG, "onLoadData2Remote: ");
+            }
+        });
+
 
     }
 
@@ -486,9 +490,6 @@ public class SWCameraStreamingActivity extends StreamingBaseActivity implements 
         return 0;
     }
 
-    @Override
-    public void onChatRoomOwnerChanged(String chatRoomId, String newOwner, String oldOwner) {
-    }
     private Handler mCountDownHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -504,13 +505,56 @@ public class SWCameraStreamingActivity extends StreamingBaseActivity implements 
             }
         }
     };
+//    @Override
+//    public void onChatRoomMemberAdded(String participant) {
+//        mTvJoin.setVisibility(View.VISIBLE);
+//        mTvJoin.setText(participant+"进入了直播间");
+//        Message message = mCountDownHandler.obtainMessage();
+//        message.arg1 = 60;
+//        mCountDownHandler.sendMessage(message);
+//    }
+//
+//    @Override
+//    public void onChatRoomMemberExited(String participant) {
+//
+//    }
+//
+//    @Override
+//    public void onMessageReceived() {
+//        //刷新消息列表
+//        if (adapter != null) {
+//            adapter.refresh();
+//            listview.smoothScrollToPosition(adapter.getItemCount() - 1);
+//        }
+//    }
+//
+//    @Override
+//    public void onMessageSelectLast() {
+//
+//    }
+//
+//    @Override
+//    public void onMessageChanged() {
+//
+//    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.iv_left_back:
+                exitLive();
+                break;
+        }
+    }
+
+    @Override
+    public void onChatRoomOwnerChanged(String chatRoomId, String newOwner, String oldOwner) {
+        ToastUtils.popUpToast("bbbbb");
+    }
+
     @Override
     public void onChatRoomMemberAdded(String participant) {
-        mTvJoin.setVisibility(View.VISIBLE);
-        mTvJoin.setText(participant+"进入了直播间");
-        Message message = mCountDownHandler.obtainMessage();
-        message.arg1 = 60;
-        mCountDownHandler.sendMessage(message);
+        ToastUtils.popUpToast("aaaaa");
     }
 
     @Override
@@ -520,11 +564,7 @@ public class SWCameraStreamingActivity extends StreamingBaseActivity implements 
 
     @Override
     public void onMessageReceived() {
-        //刷新消息列表
-        if (adapter != null) {
-            adapter.refresh();
-            listview.smoothScrollToPosition(adapter.getItemCount() - 1);
-        }
+
     }
 
     @Override
@@ -538,12 +578,18 @@ public class SWCameraStreamingActivity extends StreamingBaseActivity implements 
     }
 
     @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.iv_left_back:
-                exitLive();
-                break;
-        }
+    public void onReceiveGiftMsg(EMMessage message) {
+
+    }
+
+    @Override
+    public void onReceivePraiseMsg(EMMessage message) {
+
+    }
+
+    @Override
+    public void onReceiveBarrageMsg(EMMessage message) {
+
     }
 
     private class Switcher implements Runnable {

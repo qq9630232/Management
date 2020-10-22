@@ -99,7 +99,6 @@ public class PlayerActivity extends LiveBaseActivity implements RoomMessagesView
         sendMessage();
         EMClient.getInstance().chatManager().addMessageListener(presenter);
 
-        onMessageListInit();
         EmClientRepository emClientRepository = new EmClientRepository();
         emClientRepository.getMembers(roomId, new EMValueCallBack() {
             @Override
@@ -150,7 +149,8 @@ public class PlayerActivity extends LiveBaseActivity implements RoomMessagesView
             public void onSuccess(EMChatRoom value) {
                 //加入聊天室成功
                 Log.e(TAG, "onLoadData2Remote: ");
-
+                EMClient.getInstance().chatroomManager().addChatRoomChangeListener(presenter);
+                onMessageListInit();
             }
 
             @Override
