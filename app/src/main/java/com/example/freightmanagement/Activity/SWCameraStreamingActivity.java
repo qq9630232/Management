@@ -384,10 +384,6 @@ public class SWCameraStreamingActivity extends StreamingBaseActivity implements 
         return null;
     }
 
-//    @Override
-//    public int onPreviewFpsSelected(List<int[]> list) {
-//        return -1;
-//    }
 
     @Override
     public void onStateChanged(StreamingState streamingState, Object extra) {
@@ -490,6 +486,10 @@ public class SWCameraStreamingActivity extends StreamingBaseActivity implements 
         return 0;
     }
 
+//    @Override
+//    public void onChatRoomOwnerChanged(String chatRoomId, String newOwner, String oldOwner) {
+//
+//    }
     private Handler mCountDownHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -555,6 +555,11 @@ public class SWCameraStreamingActivity extends StreamingBaseActivity implements 
     @Override
     public void onChatRoomMemberAdded(String participant) {
         ToastUtils.popUpToast("aaaaa");
+        mTvJoin.setVisibility(View.VISIBLE);
+        mTvJoin.setText(participant+"进入了直播间");
+        Message message = mCountDownHandler.obtainMessage();
+        message.arg1 = 60;
+        mCountDownHandler.sendMessage(message);
     }
 
     @Override
@@ -564,7 +569,11 @@ public class SWCameraStreamingActivity extends StreamingBaseActivity implements 
 
     @Override
     public void onMessageReceived() {
-
+        //刷新消息列表
+        if (adapter != null) {
+            adapter.refresh();
+            listview.smoothScrollToPosition(adapter.getItemCount() - 1);
+        }
     }
 
     @Override
