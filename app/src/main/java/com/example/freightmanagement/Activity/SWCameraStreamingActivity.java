@@ -116,12 +116,13 @@ public class SWCameraStreamingActivity extends StreamingBaseActivity implements 
         mIvLeftBack.setOnClickListener(this);
         mTvCount = findViewById(R.id.tv_count);
 
-        mTvJoin = findViewById(R.id.tv_join);
+        mTvJoin = findViewById(R.id.tv_joinzhubo);
 
         DemoMsgHelper.getInstance().init(chatroomId);
         presenter = new ChatRoomPresenter(this, chatroomId);
         presenter.setOnChatRoomListener(this);
         DemoMsgHelper.getInstance().setOnCustomMsgReceiveListener(this);
+        EMClient.getInstance().chatManager().addMessageListener(presenter);
     }
 
     private void showInputView() {
@@ -150,7 +151,7 @@ public class SWCameraStreamingActivity extends StreamingBaseActivity implements 
                     @Override
                     public void run() {
                         List<String> list = (List<String>) value;
-                        mTvCount.setText("当前人数：" + list.size());
+                                mTvCount.setText("当前人数：" + list.size());
                     }
                 });
 
@@ -549,22 +550,66 @@ public class SWCameraStreamingActivity extends StreamingBaseActivity implements 
 
     @Override
     public void onChatRoomOwnerChanged(String chatRoomId, String newOwner, String oldOwner) {
-        ToastUtils.popUpToast("bbbbb");
+//        ToastUtils.popUpToast("bbbbb");
     }
 
     @Override
     public void onChatRoomMemberAdded(String participant) {
-        ToastUtils.popUpToast("aaaaa");
+//        ToastUtils.popUpToast("aaaaa");
         mTvJoin.setVisibility(View.VISIBLE);
         mTvJoin.setText(participant+"进入了直播间");
         Message message = mCountDownHandler.obtainMessage();
-        message.arg1 = 60;
+        message.arg1 = 10;
         mCountDownHandler.sendMessage(message);
+        EmClientRepository emClientRepository = new EmClientRepository();
+        emClientRepository.getMembers(chatroomId, new EMValueCallBack() {
+            @Override
+            public void onSuccess(Object value) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        List<String> list = (List<String>) value;
+                        mTvCount.setText("当前人数：" + list.size());
+                    }
+                });
+
+
+            }
+
+            @Override
+            public void onError(int error, String errorMsg) {
+
+            }
+        });
     }
 
     @Override
     public void onChatRoomMemberExited(String participant) {
+        mTvJoin.setVisibility(View.VISIBLE);
+        mTvJoin.setText(participant+"退出了直播间");
+        Message message = mCountDownHandler.obtainMessage();
+        message.arg1 = 10;
+        mCountDownHandler.sendMessage(message);
+        EmClientRepository emClientRepository = new EmClientRepository();
+        emClientRepository.getMembers(chatroomId, new EMValueCallBack() {
+            @Override
+            public void onSuccess(Object value) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        List<String> list = (List<String>) value;
+                        mTvCount.setText("当前人数：" + list.size());
+                    }
+                });
 
+
+            }
+
+            @Override
+            public void onError(int error, String errorMsg) {
+
+            }
+        });
     }
 
     @Override

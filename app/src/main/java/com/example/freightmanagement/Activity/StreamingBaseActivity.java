@@ -66,24 +66,6 @@ public abstract class StreamingBaseActivity extends BaseActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EMClient.getInstance().login("1215","123456",new EMCallBack() {//回调
-            @Override
-            public void onSuccess() {
-                EMClient.getInstance().groupManager().loadAllGroups();
-                EMClient.getInstance().chatManager().loadAllConversations();
-                Log.d("main", "登录聊天服务器成功！");
-            }
-
-            @Override
-            public void onProgress(int progress, String status) {
-
-            }
-
-            @Override
-            public void onError(int code, String message) {
-                Log.d("main", "登录聊天服务器失败！");
-            }
-        });
         initEncodingProfile();
 
 //        mLogTextView = (TextView) findViewById(R.id.log_info);
@@ -132,7 +114,7 @@ public abstract class StreamingBaseActivity extends BaseActivity implements
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        EMClient.getInstance().logout(true);
+//
     }
 
     @Override

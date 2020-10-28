@@ -13,6 +13,7 @@ import com.example.freightmanagement.Fragment.HomeFragment;
 import com.example.freightmanagement.Fragment.MeetingFragment;
 import com.example.freightmanagement.R;
 import com.example.freightmanagement.View.MyViewPager;
+import com.hyphenate.chat.EMClient;
 
 import java.util.ArrayList;
 
@@ -136,5 +137,9 @@ public class MainActivity extends BaseActivity {
     }
 
 
-
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EMClient.getInstance().logout(true);
+    }
 }

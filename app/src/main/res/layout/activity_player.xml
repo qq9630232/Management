@@ -65,8 +65,11 @@
         android:layout_marginTop="@dimen/x500"
         android:layout_marginLeft="@dimen/x40"
         android:layout_above="@id/listview"
+        android:text="aaaaaaaaa"
         android:background="@drawable/em_live_chat_item_bg_shape"
         android:layout_marginBottom="@dimen/x20"
+        android:textColor="@color/white"
+        android:textSize="@dimen/x30"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
     <com.example.freightmanagement.View.SingleBarrageView

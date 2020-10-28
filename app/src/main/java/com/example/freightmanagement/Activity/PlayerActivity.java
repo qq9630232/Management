@@ -97,29 +97,6 @@ public class PlayerActivity extends LiveBaseActivity implements RoomMessagesView
         isPermissionOK();
         live();
         sendMessage();
-        EMClient.getInstance().chatManager().addMessageListener(presenter);
-
-        EmClientRepository emClientRepository = new EmClientRepository();
-        emClientRepository.getMembers(roomId, new EMValueCallBack() {
-            @Override
-            public void onSuccess(Object value) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        List<String> list = (List<String>) value;
-                        mTvCount.setText("当前人数：" + list.size());
-                    }
-                });
-
-
-            }
-
-            @Override
-            public void onError(int error, String errorMsg) {
-
-            }
-        });
-
     }
 
     /**
@@ -143,6 +120,7 @@ public class PlayerActivity extends LiveBaseActivity implements RoomMessagesView
 //        roomId = "127395385376769";
         presenter = new ChatRoomPresenter(this, roomId);
         presenter.setOnChatRoomListener(this);
+        EMClient.getInstance().chatManager().addMessageListener(presenter);
         EMClient.getInstance().chatroomManager().joinChatRoom(roomId, new EMValueCallBack<EMChatRoom>() {
 
             @Override
@@ -151,6 +129,26 @@ public class PlayerActivity extends LiveBaseActivity implements RoomMessagesView
                 Log.e(TAG, "onLoadData2Remote: ");
                 EMClient.getInstance().chatroomManager().addChatRoomChangeListener(presenter);
                 onMessageListInit();
+                EmClientRepository emClientRepository = new EmClientRepository();
+                emClientRepository.getMembers(roomId, new EMValueCallBack() {
+                    @Override
+                    public void onSuccess(Object value) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                List<String> list = (List<String>) value;
+                                mTvCount.setText("当前人数：" + list.size());
+                            }
+                        });
+
+
+                    }
+
+                    @Override
+                    public void onError(int error, String errorMsg) {
+
+                    }
+                });
             }
 
             @Override
@@ -295,13 +293,57 @@ public class PlayerActivity extends LiveBaseActivity implements RoomMessagesView
         mTvJoin.setVisibility(View.VISIBLE);
         mTvJoin.setText(participant+"进入了直播间");
         Message message = mCountDownHandler.obtainMessage();
-        message.arg1 = 60;
+        message.arg1 = 10;
         mCountDownHandler.sendMessage(message);
+        EmClientRepository emClientRepository = new EmClientRepository();
+        emClientRepository.getMembers(roomId, new EMValueCallBack() {
+            @Override
+            public void onSuccess(Object value) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        List<String> list = (List<String>) value;
+                        mTvCount.setText("当前人数：" + list.size());
+                    }
+                });
+
+
+            }
+
+            @Override
+            public void onError(int error, String errorMsg) {
+
+            }
+        });
     }
 
     @Override
     public void onChatRoomMemberExited(String participant) {
+        mTvJoin.setVisibility(View.VISIBLE);
+        mTvJoin.setText(participant+"退出了直播间");
+        Message message = mCountDownHandler.obtainMessage();
+        message.arg1 = 10;
+        mCountDownHandler.sendMessage(message);
+        EmClientRepository emClientRepository = new EmClientRepository();
+        emClientRepository.getMembers(roomId, new EMValueCallBack() {
+            @Override
+            public void onSuccess(Object value) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        List<String> list = (List<String>) value;
+                        mTvCount.setText("当前人数：" + list.size());
+                    }
+                });
 
+
+            }
+
+            @Override
+            public void onError(int error, String errorMsg) {
+
+            }
+        });
     }
 
     @Override
