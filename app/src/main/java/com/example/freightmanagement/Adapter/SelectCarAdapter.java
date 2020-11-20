@@ -1,6 +1,7 @@
 package com.example.freightmanagement.Adapter;
 
 import android.content.Context;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,7 +26,7 @@ import java.util.List;
 public class SelectCarAdapter extends RecyclerView.Adapter<SelectCarAdapter.ViewHolder> {
     private final LayoutInflater layoutInflater;
     private Context context;
-    private List<SelectCarBean.DataBean> data;
+    private List<SelectCarBean.DataBean.ContentBean> data;
     private static int TAG_VIEW = 0;
     private String TAG = "GiftAdapter";
     private HashMap<Integer, Boolean> states = new HashMap<>();
@@ -73,12 +74,18 @@ public class SelectCarAdapter extends RecyclerView.Adapter<SelectCarAdapter.View
         holder.rb_check.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                clearState();
                 if (isChecked) {
-                    clearState();
                     setCheckedState(position);
                     mItemClickListener.onItemClick(position);
                     if (!isBind) { //标识位
-                        notifyDataSetChanged();
+//                        new Handler().post(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                // 刷新操作
+//                                notifyDataSetChanged();
+//                            }
+//                        });
                     }
                 }
             }
@@ -94,6 +101,7 @@ public class SelectCarAdapter extends RecyclerView.Adapter<SelectCarAdapter.View
         for (int i = 0; i < getItemCount(); i++) {
             states.put(i, false);
         }
+
     }
 
     private void setCheckedState(int position) {
@@ -125,8 +133,8 @@ public class SelectCarAdapter extends RecyclerView.Adapter<SelectCarAdapter.View
         }
     }
 
-    public void setData(List<SelectCarBean.DataBean> data) {
-        this.data = data;
+    public void setData(List<SelectCarBean.DataBean.ContentBean> mData) {
+        this.data = mData;
         clearState();
         notifyDataSetChanged();
     }

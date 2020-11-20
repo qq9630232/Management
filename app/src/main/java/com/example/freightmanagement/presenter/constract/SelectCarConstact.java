@@ -5,7 +5,7 @@ import com.example.freightmanagement.model.DriverInfoSubmitParam;
 
 public interface SelectCarConstact {
 
-    void getCar();
+    void getCar(int pageNum,int pageSize);
 
     void searchCar(String key);
 

@@ -131,7 +131,7 @@ public class BaseApiConstants {
     /**
      * 选择车辆
      */
-    public static final String API_XUANZECHELIANG = "/cccc/carOwner/getPassedCar";
+    public static final String API_XUANZECHELIANG = "/cccc/carOwner/getPassedCarByPage";
 
     /**
      * 解除合同

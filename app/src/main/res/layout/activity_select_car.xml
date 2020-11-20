@@ -32,7 +32,7 @@
        android:layout_marginBottom="@dimen/x2"
        android:background="@mipmap/search_bar_icon"/>
 </LinearLayout>
-   <androidx.recyclerview.widget.RecyclerView
+   <com.example.freightmanagement.View.PullRecyclerView
        android:id="@+id/recyclerView"
        android:layout_width="match_parent"
        android:layout_height="match_parent"

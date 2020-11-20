@@ -38,4 +38,8 @@
     <string name="em_live_mute_all">已全体禁言</string>
     <string name="em_live_out_mute_all">解除全体禁言</string>
 
+    <string name="pull_to_refresh_footer_pull_label">上拉加载更多</string>
+    <string name="load_more_f">加载失败,请检查网络</string>
+    <string name="refresh_f">刷新失败,请检查网络</string>
+
 </resources>

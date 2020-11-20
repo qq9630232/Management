@@ -7,6 +7,7 @@ import com.example.freightmanagement.Utils.Network.RestApi;
 import com.example.freightmanagement.model.DriverInfoSubmitParam;
 import com.example.freightmanagement.presenter.constract.SelectCarConstact;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 import static com.example.freightmanagement.Base.BaseApiConstants.API_DRIVER_REGISTER;
 
@@ -33,8 +34,11 @@ public class SelectCarPresenter extends BasePresenter<SelectCarConstact.View> im
         });
     }
     @Override
-    public void getCar() {
-        RestApi.getInstance().get(BaseApiConstants.API_XUANZECHELIANG, new OnRequestResultForCommon() {
+    public void getCar(int pageNum,int pageSize) {
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("pageNum", pageNum);
+        jsonObject.addProperty("pageSize", pageSize);
+        RestApi.getInstance().post(BaseApiConstants.API_XUANZECHELIANG, jsonObject.toString(),new OnRequestResultForCommon() {
             @Override
             public void onSuccess(String json) {
                 super.onSuccess(json);
@@ -51,6 +55,7 @@ public class SelectCarPresenter extends BasePresenter<SelectCarConstact.View> im
                 super.netUnlink();
             }
         });
+
     }
 
     @Override
