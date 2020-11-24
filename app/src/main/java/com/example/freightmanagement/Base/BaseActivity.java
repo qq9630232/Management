@@ -10,7 +10,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
@@ -46,6 +45,7 @@ import com.example.freightmanagement.Utils.WindowUtils;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.io.File;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
@@ -519,6 +519,12 @@ public abstract class BaseActivity<P extends BasePresenter> extends FragmentActi
         request.setTitle("正在下载");
         request.setVisibleInDownloadsUi(true);
         //sdcard目录下的download文件夹
+        File file = new File(APK_PATH);
+
+
+        if(!file.exists()){
+            file.mkdir();
+        }
         request.setDestinationInExternalPublicDir(APK_PATH, "Freightmanagement.apk");
         // 将下载请求放入队列
         downloadManager.enqueue(request);

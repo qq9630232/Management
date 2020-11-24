@@ -1,12 +1,17 @@
 package com.example.freightmanagement.Activity;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+
+import androidx.core.app.ActivityCompat;
 
 import com.example.freightmanagement.Base.BaseActivity;
 import com.example.freightmanagement.Bean.TokenBean;
@@ -27,6 +32,11 @@ import com.hyphenate.chat.EMChatRoom;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMCursorResult;
 import com.hyphenate.exceptions.HyphenateException;
+import com.xuexiang.xupdate.XUpdate;
+import com.xuexiang.xupdate._XUpdate;
+import com.xuexiang.xupdate.service.OnFileDownloadListener;
+
+import java.io.File;
 
 import static com.example.freightmanagement.Base.BaseApiConstants.WEBVERSION;
 import static com.example.freightmanagement.common.Constants.ADMIN_TYPE;
@@ -85,13 +95,72 @@ public class LoginActivity extends BaseActivity<LoginPresenter> implements Login
     public int setLayoutResource() {
         return R.layout.activity_login;
     }
-
+    private boolean checkGalleryPermission() {
+        int ret = ActivityCompat.checkSelfPermission(this, Manifest.permission
+                .READ_EXTERNAL_STORAGE);
+        int wet = ActivityCompat.checkSelfPermission(this, Manifest.permission
+                .WRITE_EXTERNAL_STORAGE);
+        if (ret != PackageManager.PERMISSION_GRANTED && wet != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    1000);
+            return false;
+        }
+        return true;
+    }
     @Override
     protected void onInitView() {
+        checkGalleryPermission();
         initView();
         flag=true;
         // 获取本版本号，是否更新
         // getVersion(VersionUtils.getVersion(this));
+        String url ="https://xuexiangjys.oss-cn-shanghai.aliyuncs.com/apk/xupdate_demo_1.0.2.apk";
+//        String url ="http://47.114.155.239:3005/app/Freightmanagement.apk";
+//        try {
+//        try {
+//            downloadApk(url);
+//        } catch (PackageManager.NameNotFoundException e) {
+//            e.printStackTrace();
+//        }
+            XUpdate.newBuild(getApplicationContext())
+                    .apkCacheDir(Environment.getExternalStorageDirectory().getAbsolutePath()) //设置下载缓存的根目录
+                    .build()
+                    .download(url, new OnFileDownloadListener() {   //设置下载的地址和下载的监听
+                        @Override
+                        public void onStart() {
+                            Log.e("zxz", "kaishi");
+//                            HProgressDialogUtils.showHorizontalProgressDialog(getContext(), "下载进度", false);
+                        }
+
+                        @Override
+                        public void onProgress(float progress, long total) {
+//                            HProgressDialogUtils.setProgress(Math.round(progress * 100));
+//                            ToastUtils.popUpToast(Math.round(progress * 100));
+                            Log.e("zxz",""+Math.round(progress * 100));
+
+                        }
+
+                        @Override
+                        public boolean onCompleted(File file) {
+//                            HProgressDialogUtils.cancel();
+                            Log.e("zxz", "onCompleted: ");
+                            ToastUtils.popUpToast("apk下载完毕，文件路径：" + file.getPath());
+                            _XUpdate.startInstallApk(getContext(), file); //填写文件所在的路径
+
+                            return false;
+                        }
+
+                        @Override
+                        public void onError(Throwable throwable) {
+//                            HProgressDialogUtils.cancel();
+                            Log.e("zxz", "error: ");
+
+                        }
+                    });
+//        } catch (PackageManager.NameNotFoundException e) {
+//            e.printStackTrace();
+//        }
         // tv_Version.setText(VersionUtils.getVersionName(this) + "-" +VersionUtils.getVersion(this));
     }
 

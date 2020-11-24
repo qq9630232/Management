@@ -277,7 +277,7 @@ public class BaseApiConstants {
      * Apk路径
      */
     public static final String SDFILE = Environment.getExternalStoragePublicDirectory("") + File.separator + "Freightmanagement/gt/";
-    public static final String APK_PATH = "Freightmanagement/gt/"+ "apk" + File.separator;
+    public static final String APK_PATH = Environment.getExternalStorageDirectory().getAbsolutePath();
     public static final String APK_PATH_ABSOULT = SDFILE+ "apk" + File.separator;
 
 }
